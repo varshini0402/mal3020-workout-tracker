@@ -13,3 +13,6 @@ button.danger { background: #dc2626; }
 .workout { display: flex; justify-content: space-between; align-items: flex-start; border-top: 1px solid #eee; padding: 10px 0; }
 .detail, .date { color: #555; font-size: 13px; }
 .switch { text-align: center; font-size: 14px; }
+.status { font-size: 12px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
+.status.on { background: #dcfce7; color: #166534; }
+.status.off { background: #fee2e2; color: #991b1b; }

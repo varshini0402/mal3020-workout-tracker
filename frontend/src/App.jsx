@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import AuthForm from './components/AuthForm';
 import MemberDashboard from './components/MemberDashboard';
+import TrainerDashboard from './components/TrainerDashboard';
+import TrainerPicker from './components/TrainerPicker';
 import './App.css';
 
 export default function App() {
@@ -28,8 +30,14 @@ export default function App() {
         </div>
       </header>
 
-      {session.user.role === 'member' && <MemberDashboard token={session.token} />}
-      {session.user.role !== 'member' && <div className="card"><p>Trainer dashboard coming next.</p></div>}
+      {session.user.role === 'member' && (
+        <>
+          <TrainerPicker token={session.token} />
+          <MemberDashboard token={session.token} />
+        </>
+      )}
+      {session.user.role === 'trainer' && <TrainerDashboard token={session.token} />}
+      {session.user.role === 'admin' && <div className="card"><p>Admin dashboard coming later.</p></div>}
     </div>
   );
 }
