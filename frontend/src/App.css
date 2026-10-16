@@ -1,0 +1,15 @@
+.container { max-width: 720px; margin: 0 auto; padding: 16px; }
+header { display: flex; justify-content: space-between; align-items: center; }
+header span { margin-right: 12px; }
+.card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin: 16px 0; }
+.auth { max-width: 360px; margin: 60px auto; }
+form { display: flex; flex-direction: column; gap: 8px; }
+input, select { padding: 8px; border: 1px solid #bbb; border-radius: 4px; font-size: 14px; }
+button { padding: 8px 14px; border: none; border-radius: 4px; background: #2563eb; color: #fff; cursor: pointer; }
+button.secondary { background: #6b7280; }
+button.danger { background: #dc2626; }
+.row { display: flex; gap: 8px; }
+.error { color: #dc2626; margin: 0; }
+.workout { display: flex; justify-content: space-between; align-items: flex-start; border-top: 1px solid #eee; padding: 10px 0; }
+.detail, .date { color: #555; font-size: 13px; }
+.switch { text-align: center; font-size: 14px; }
