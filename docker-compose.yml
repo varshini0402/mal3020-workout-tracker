@@ -6,5 +6,26 @@ services:
     volumes:
       - mongo-data:/data/db
 
+  api:
+    build: ./api
+    ports:
+      - "3000:3000"
+    environment:
+      MONGO_URL: mongodb://mongo:27017/workouts
+      WS_URL: http://websocket:4000
+      JWT_SECRET: dev-secret-change-me
+      INTERNAL_KEY: dev-internal-key
+    depends_on:
+      - mongo
+      - websocket
+
+  websocket:
+    build: ./websocket
+    ports:
+      - "4000:4000"
+    environment:
+      JWT_SECRET: dev-secret-change-me
+      INTERNAL_KEY: dev-internal-key
+
 volumes:
   mongo-data:
