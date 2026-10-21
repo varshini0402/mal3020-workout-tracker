@@ -12,16 +12,18 @@ export default function MemberDashboard({ token }) {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState('');
+  const [refresh, setRefresh] = useState(0);
 
-  const load = async () => {
-    try {
-      setWorkouts(await request('/workouts', { token }));
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  // Load workouts on first render and whenever "refresh" changes
+  useEffect(() => {
+    let cancelled = false;
+    request('/workouts', { token })
+      .then((data) => { if (!cancelled) setWorkouts(data); })
+      .catch((err) => { if (!cancelled) setError(err.message); });
+    return () => { cancelled = true; };
+  }, [token, refresh]);
 
-  useEffect(() => { load(); }, []);
+  const reload = () => setRefresh((n) => n + 1);
 
   const update = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -56,7 +58,7 @@ export default function MemberDashboard({ token }) {
       }
       setForm(emptyForm);
       setEditingId(null);
-      load();
+      reload();
     } catch (err) {
       setError(err.message);
     }
@@ -83,7 +85,7 @@ export default function MemberDashboard({ token }) {
   const remove = async (id) => {
     try {
       await request(`/workouts/${id}`, { method: 'DELETE', token });
-      load();
+      reload();
     } catch (err) {
       setError(err.message);
     }

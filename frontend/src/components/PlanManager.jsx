@@ -11,16 +11,18 @@ export default function PlanManager({ token, members }) {
   const [items, setItems] = useState([{ ...emptyItem }]);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState('');
+  const [refresh, setRefresh] = useState(0);
 
-  const load = async () => {
-    try {
-      setPlans(await request('/plans', { token }));
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  // Load plans on first render and whenever "refresh" changes
+  useEffect(() => {
+    let cancelled = false;
+    request('/plans', { token })
+      .then((data) => { if (!cancelled) setPlans(data); })
+      .catch((err) => { if (!cancelled) setError(err.message); });
+    return () => { cancelled = true; };
+  }, [token, refresh]);
 
-  useEffect(() => { load(); }, []);
+  const reload = () => setRefresh((n) => n + 1);
 
   const memberName = (id) => members.find((m) => m._id === id)?.name || 'Unknown member';
 
@@ -59,7 +61,7 @@ export default function PlanManager({ token, members }) {
         await request('/plans', { method: 'POST', token, body: { memberId, title, items: cleanItems() } });
       }
       reset();
-      load();
+      reload();
     } catch (err) {
       setError(err.message);
     }
@@ -85,7 +87,7 @@ export default function PlanManager({ token, members }) {
     try {
       await request(`/plans/${id}`, { method: 'DELETE', token });
       if (editingId === id) reset();
-      load();
+      reload();
     } catch (err) {
       setError(err.message);
     }
