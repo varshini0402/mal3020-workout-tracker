@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install API dependencies
+        working-directory: api
+        run: npm ci
+
+      - name: Start the system with Docker Compose
+        run: docker compose up -d --build
+
+      - name: Wait for the API to be ready
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/api/health; then exit 0; fi
+            sleep 2
+          done
+          docker compose logs
+          exit 1
+
+      - name: Run unit and system tests
+        working-directory: api
+        run: npm test
+
+      - name: Show container logs if something failed
+        if: failure()
+        run: docker compose logs
+
+      - name: Stop the system
+        if: always()
+        run: docker compose down
