@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import AuthForm from './components/AuthForm';
 import MemberDashboard from './components/MemberDashboard';
+import MemberPlans from './components/MemberPlans';
 import TrainerDashboard from './components/TrainerDashboard';
 import TrainerPicker from './components/TrainerPicker';
 import './App.css';
@@ -33,6 +34,7 @@ export default function App() {
       {session.user.role === 'member' && (
         <>
           <TrainerPicker token={session.token} />
+          <MemberPlans token={session.token} />
           <MemberDashboard token={session.token} />
         </>
       )}

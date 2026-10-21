@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { request } from '../api';
+import PlanManager from './PlanManager';
 
 export default function TrainerDashboard({ token }) {
   const [members, setMembers] = useState([]);
@@ -54,6 +55,8 @@ export default function TrainerDashboard({ token }) {
           </div>
         ))}
       </div>
+
+      <PlanManager token={token} members={members} />
     </div>
   );
 }
