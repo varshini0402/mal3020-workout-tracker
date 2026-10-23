@@ -4,6 +4,7 @@ import MemberDashboard from './components/MemberDashboard';
 import MemberPlans from './components/MemberPlans';
 import TrainerDashboard from './components/TrainerDashboard';
 import TrainerPicker from './components/TrainerPicker';
+import AdminDashboard from './components/AdminDashboard';
 import './App.css';
 
 export default function App() {
@@ -39,7 +40,9 @@ export default function App() {
         </>
       )}
       {session.user.role === 'trainer' && <TrainerDashboard token={session.token} />}
-      {session.user.role === 'admin' && <div className="card"><p>Admin dashboard coming later.</p></div>}
+      {session.user.role === 'admin' && (
+        <AdminDashboard token={session.token} currentUserId={session.user.id} />
+      )}
     </div>
   );
 }
