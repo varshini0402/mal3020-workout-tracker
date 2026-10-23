@@ -27,5 +27,12 @@ services:
       JWT_SECRET: dev-secret-change-me
       INTERNAL_KEY: dev-internal-key
 
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+
 volumes:
   mongo-data:
