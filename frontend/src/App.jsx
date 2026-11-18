@@ -5,7 +5,10 @@ import MemberPlans from './components/MemberPlans';
 import TrainerDashboard from './components/TrainerDashboard';
 import TrainerPicker from './components/TrainerPicker';
 import AdminDashboard from './components/AdminDashboard';
+import Logo from './components/Logo';
 import './App.css';
+
+const headlines = { member: 'Your training.', trainer: 'Coach with purpose.', admin: 'Keep it moving.' };
 
 export default function App() {
   const [session, setSession] = useState(() => JSON.parse(localStorage.getItem('session') || 'null'));
@@ -23,26 +26,31 @@ export default function App() {
   if (!session) return <AuthForm onLogin={login} />;
 
   return (
-    <div className="container">
-      <header>
-        <h1>Workout Tracker</h1>
-        <div>
-          <span>{session.user.name} ({session.user.role})</span>
-          <button className="secondary" onClick={logout}>Log out</button>
+    <div>
+      <header className="topbar">
+        <div className="topbar-inner">
+          <div className="brand"><Logo color="#8ee3df" /> LapLift</div>
+          <div className="userbox">
+            <span>{session.user.name}</span>
+            <span className="role-badge">{session.user.role}</span>
+            <button className="secondary" onClick={logout}>Log out</button>
+          </div>
         </div>
       </header>
 
-      {session.user.role === 'member' && (
-        <>
-          <TrainerPicker token={session.token} />
-          <MemberPlans token={session.token} />
-          <MemberDashboard token={session.token} />
-        </>
-      )}
-      {session.user.role === 'trainer' && <TrainerDashboard token={session.token} />}
-      {session.user.role === 'admin' && (
-        <AdminDashboard token={session.token} currentUserId={session.user.id} />
-      )}
+      <main className="container">
+        <h1 className="hero">{headlines[session.user.role]}</h1>
+        {session.user.role === 'member' && (
+          <MemberDashboard
+            token={session.token}
+            left={<><TrainerPicker token={session.token} /><MemberPlans token={session.token} /></>}
+          />
+        )}
+        {session.user.role === 'trainer' && <TrainerDashboard token={session.token} />}
+        {session.user.role === 'admin' && (
+          <AdminDashboard token={session.token} currentUserId={session.user.id} />
+        )}
+      </main>
     </div>
   );
 }

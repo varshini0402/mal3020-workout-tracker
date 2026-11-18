@@ -7,7 +7,12 @@ export default function TrainerPicker({ token }) {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    request('/users/trainers', { token }).then(setTrainers).catch(() => {});
+    Promise.all([request('/users/trainers', { token }), request('/users/me', { token })])
+      .then(([list, me]) => {
+        setTrainers(list);
+        setSelected(me.trainerId || '');
+      })
+      .catch(() => {});
   }, [token]);
 
   const save = async () => {
@@ -22,16 +27,16 @@ export default function TrainerPicker({ token }) {
   return (
     <div className="card">
       <h2>My trainer</h2>
-      <div className="row">
+      <div className="stack">
         <select value={selected} onChange={(e) => setSelected(e.target.value)}>
           <option value="">Choose a trainer...</option>
           {trainers.map((t) => (
             <option key={t._id} value={t._id}>{t.name}</option>
           ))}
         </select>
-        <button onClick={save} disabled={!selected}>Save</button>
+        <button className="save-wide" onClick={save} disabled={!selected}>Save</button>
+        {message && <p className="detail">{message}</p>}
       </div>
-      {message && <p className="detail">{message}</p>}
     </div>
   );
 }

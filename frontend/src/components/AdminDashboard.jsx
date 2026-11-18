@@ -42,11 +42,10 @@ export default function AdminDashboard({ token, currentUserId }) {
 
   return (
     <div>
-      <div className="card">
-        <h2>Overview</h2>
-        <p>
-          {users.length} users: {count('member')} members, {count('trainer')} trainers, {count('admin')} admins
-        </p>
+      <div className="card dark">
+        <div className="detail">OVERVIEW</div>
+        <div className="big-number">{users.length}</div>
+        <p>users: {count('member')} members, {count('trainer')} trainers, {count('admin')} admins</p>
       </div>
 
       <div className="card">

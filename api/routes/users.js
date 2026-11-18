@@ -18,6 +18,26 @@ router.get('/trainers', async (req, res) => {
   res.json(trainers);
 });
 
+// The logged-in user's own details (used to show the current trainer)
+router.get('/me', async (req, res) => {
+  const user = await User.findById(req.user.id).select('name email role trainerId');
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  res.json(user);
+});
+
+// A trainer views the workouts of one of their own members
+router.get('/my-members/:id/workouts', async (req, res) => {
+  if (req.user.role !== 'trainer') return res.status(403).json({ error: 'Trainers only' });
+  try {
+    const member = await User.findOne({ _id: req.params.id, trainerId: req.user.id });
+    if (!member) return res.status(404).json({ error: 'Member not found' });
+    const workouts = await Workout.find({ userId: member._id }).sort({ date: -1 }).limit(20);
+    res.json(workouts);
+  } catch (err) {
+    res.status(400).json({ error: 'Invalid member id' });
+  }
+});
+
 // A member chooses their trainer
 router.put('/me/trainer', async (req, res) => {
   try {

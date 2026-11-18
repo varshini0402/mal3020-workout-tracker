@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { request } from '../api';
+import { Trash } from './Icons';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const emptyItem = { exercise: '', sets: '', reps: '', dayOfWeek: 'Monday' };
@@ -13,7 +14,6 @@ export default function PlanManager({ token, members }) {
   const [error, setError] = useState('');
   const [refresh, setRefresh] = useState(0);
 
-  // Load plans on first render and whenever "refresh" changes
   useEffect(() => {
     let cancelled = false;
     request('/plans', { token })
@@ -23,7 +23,6 @@ export default function PlanManager({ token, members }) {
   }, [token, refresh]);
 
   const reload = () => setRefresh((n) => n + 1);
-
   const memberName = (id) => members.find((m) => m._id === id)?.name || 'Unknown member';
 
   const reset = () => {
@@ -36,7 +35,6 @@ export default function PlanManager({ token, members }) {
   const updateItem = (index, field, value) => {
     setItems(items.map((it, i) => (i === index ? { ...it, [field]: value } : it)));
   };
-
   const addItem = () => setItems([...items, { ...emptyItem }]);
   const removeItem = (index) => setItems(items.filter((_, i) => i !== index));
 
@@ -97,38 +95,45 @@ export default function PlanManager({ token, members }) {
     <div>
       <div className="card">
         <h2>{editingId ? 'Edit plan' : 'Create a plan'}</h2>
-        <form onSubmit={submit}>
-          <select value={memberId} onChange={(e) => setMemberId(e.target.value)} disabled={!!editingId}>
-            <option value="">Choose a member...</option>
-            {members.map((m) => (
-              <option key={m._id} value={m._id}>{m.name}</option>
-            ))}
-          </select>
-          <input placeholder="Plan title (e.g. 4-week strength plan)" value={title}
-            onChange={(e) => setTitle(e.target.value)} required />
+        <form className="stack" onSubmit={submit}>
+          <div className="field-grid g2">
+            <label className="field">Member
+              <select value={memberId} onChange={(e) => setMemberId(e.target.value)} disabled={!!editingId}>
+                <option value="">Choose a member...</option>
+                {members.map((m) => (
+                  <option key={m._id} value={m._id}>{m.name}</option>
+                ))}
+              </select>
+            </label>
+            <label className="field">Plan title
+              <input placeholder="Strength & Swim" value={title} onChange={(e) => setTitle(e.target.value)} required />
+            </label>
+          </div>
 
+          <div className="plan-cols head">
+            <span>Exercise</span><span>Sets</span><span>Reps</span><span>Day</span><span />
+          </div>
           {items.map((it, i) => (
-            <div className="item-row" key={i}>
-              <input placeholder="Exercise" value={it.exercise}
-                onChange={(e) => updateItem(i, 'exercise', e.target.value)} />
-              <input type="number" placeholder="Sets" value={it.sets}
-                onChange={(e) => updateItem(i, 'sets', e.target.value)} />
-              <input type="number" placeholder="Reps" value={it.reps}
-                onChange={(e) => updateItem(i, 'reps', e.target.value)} />
+            <div className="plan-cols" key={i}>
+              <input placeholder="Squats" value={it.exercise} onChange={(e) => updateItem(i, 'exercise', e.target.value)} />
+              <input type="number" value={it.sets} onChange={(e) => updateItem(i, 'sets', e.target.value)} />
+              <input type="number" value={it.reps} onChange={(e) => updateItem(i, 'reps', e.target.value)} />
               <select value={it.dayOfWeek} onChange={(e) => updateItem(i, 'dayOfWeek', e.target.value)}>
                 {days.map((d) => <option key={d} value={d}>{d}</option>)}
               </select>
-              {items.length > 1 && (
-                <button type="button" className="danger" onClick={() => removeItem(i)}>X</button>
-              )}
+              {items.length > 1
+                ? <button type="button" className="icon-btn" onClick={() => removeItem(i)} aria-label="Remove exercise"><Trash /></button>
+                : <span />}
             </div>
           ))}
 
-          <button type="button" className="secondary" onClick={addItem}>+ Add exercise</button>
           {error && <p className="error">{error}</p>}
-          <div className="row">
-            <button type="submit">{editingId ? 'Save changes' : 'Create plan'}</button>
-            {editingId && <button type="button" className="secondary" onClick={reset}>Cancel</button>}
+          <div className="form-actions">
+            <button type="button" className="secondary" onClick={addItem}>+ Add exercise</button>
+            <div className="row">
+              {editingId && <button type="button" className="secondary" onClick={reset}>Cancel</button>}
+              <button type="submit" className="create-btn">{editingId ? 'Save changes' : 'Create plan'}</button>
+            </div>
           </div>
         </form>
       </div>
@@ -137,13 +142,14 @@ export default function PlanManager({ token, members }) {
         <h2>Plans I created</h2>
         {plans.length === 0 && <p>No plans yet.</p>}
         {plans.map((p) => (
-          <div className="workout" key={p._id}>
-            <div>
-              <strong>{p.title}</strong> <span className="date">for {memberName(p.memberId)}</span>
+          <div className="plan-row" key={p._id}>
+            <div className="plan-title">
+              <strong>{p.title}</strong>
+              <span>{memberName(p.memberId)}</span>
+            </div>
+            <div className="plan-items">
               {p.items.map((i) => (
-                <div key={i._id} className="detail">
-                  {i.dayOfWeek}: {i.exercise} ({i.sets} x {i.reps})
-                </div>
+                <div key={i._id}>{i.dayOfWeek}: {i.exercise} ({i.sets} × {i.reps})</div>
               ))}
             </div>
             <div className="row">
